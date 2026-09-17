@@ -4,19 +4,19 @@
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  background-color: #f8fafc;
+  background-color: var(--c-pastel-5);
 }
 
-/* Sticky Header Navbar */
+/* Sticky Header Navbar - Deep Dark Coffee (#553d2a) */
 .header-navbar {
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: var(--c-dark-1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid var(--c-dark-4);
+  box-shadow: 0 4px 20px -2px rgba(85, 61, 42, 0.25);
 }
 
 .header-inner {
@@ -48,36 +48,36 @@
 .brand-logo {
   width: 34px;
   height: 34px;
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--c-dark-4) 0%, var(--c-dark-3) 100%);
+  color: var(--c-pastel-5);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
 .brand-name {
   font-size: 1.25rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #0f172a;
+  color: var(--c-pastel-5);
   white-space: nowrap;
 }
 
 .brand-highlight {
-  color: #0284c7;
+  color: var(--c-pastel-4);
 }
 
 .admin-badge {
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: var(--c-dark-3);
+  color: var(--c-pastel-4);
   font-size: 0.8rem;
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 9999px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-dark-5);
   white-space: nowrap;
 }
 
@@ -98,9 +98,9 @@
 }
 
 .category-pill {
-  background-color: #f1f5f9;
-  color: #475569;
-  border: 1px solid transparent;
+  background-color: var(--c-dark-2);
+  color: var(--c-pastel-4);
+  border: 1px solid var(--c-dark-4);
   font-family: var(--font-family);
   font-size: 0.825rem;
   font-weight: 600;
@@ -113,14 +113,16 @@
 }
 
 .category-pill:hover {
-  background-color: #e2e8f0;
-  color: #0f172a;
+  background-color: var(--c-dark-4);
+  color: var(--c-pastel-5);
 }
 
 .category-pill.active {
-  background-color: #0f172a;
-  color: #ffffff;
-  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.15);
+  background-color: var(--c-pastel-4);
+  color: var(--c-dark-1);
+  font-weight: 700;
+  border-color: var(--c-pastel-3);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
 }
 
 /* View Switcher (Top Right Nav) */
@@ -135,10 +137,10 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background-color: #f1f5f9;
+  background-color: var(--c-dark-2);
   padding: 3px;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-dark-4);
 }
 
 .nav-tab {
@@ -147,26 +149,26 @@
   gap: 5px;
   background: transparent;
   border: none;
-  color: #64748b;
+  color: var(--c-pastel-3);
   font-family: var(--font-family);
   font-size: 0.825rem;
   font-weight: 600;
   padding: 6px 12px;
-  border-radius: 9px;
+  border-radius: 9999px;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .nav-tab:hover {
-  color: #0f172a;
+  color: var(--c-pastel-5);
 }
 
 .nav-tab.active {
-  background-color: #ffffff;
-  color: #0284c7;
+  background-color: var(--c-pastel-5);
+  color: var(--c-dark-1);
   font-weight: 700;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .tab-icon {
@@ -177,12 +179,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  color: #0f172a;
+  background-color: var(--c-pastel-5);
+  border: 1.5px solid var(--c-pastel-3);
+  color: var(--c-dark-1);
   font-family: var(--font-family);
   font-size: 0.825rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 6px 14px;
   border-radius: 10px;
   cursor: pointer;
@@ -192,15 +194,16 @@
 }
 
 .cart-button:hover {
-  border-color: #0284c7;
-  color: #0284c7;
+  background-color: var(--c-pastel-4);
+  border-color: var(--c-dark-3);
+  color: var(--c-dark-1);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
 .cart-badge {
-  background-color: #0284c7;
-  color: #ffffff;
+  background-color: var(--c-dark-1);
+  color: var(--c-pastel-5);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 2px 7px;
@@ -227,20 +230,20 @@
 
 /* Hero Banner */
 .hero-banner {
-  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #ffffff 0%, var(--c-pastel-4) 100%);
+  border: 1px solid var(--c-pastel-3);
   border-radius: 20px;
   padding: 36px 32px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .banner-badge {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: var(--c-dark-1);
+  color: var(--c-pastel-5);
   font-size: 0.8rem;
   font-weight: 700;
   padding: 4px 12px;
@@ -250,13 +253,13 @@
 .banner-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--c-dark-1);
   letter-spacing: -0.02em;
 }
 
 .banner-subtitle {
   font-size: 1rem;
-  color: var(--text-muted);
+  color: var(--c-dark-5);
   max-width: 600px;
 }
 
@@ -265,19 +268,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--c-pastel-3);
   padding-bottom: 12px;
 }
 
 .catalog-title {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--c-dark-1);
 }
 
 .catalog-count {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--c-dark-5);
   margin-top: 2px;
 }
 
@@ -292,7 +295,7 @@
 /* Product Card */
 .product-card {
   background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--c-pastel-3);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -304,7 +307,7 @@
 .product-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
-  border-color: #cbd5e1;
+  border-color: var(--c-pastel-2);
 }
 
 .product-image-container {
@@ -312,7 +315,7 @@
   width: 100%;
   height: 190px;
   overflow: hidden;
-  background-color: #f1f5f9;
+  background-color: var(--c-pastel-5);
 }
 
 .product-image {
@@ -331,9 +334,9 @@
   top: 12px;
   left: 12px;
   z-index: 2;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(85, 61, 42, 0.85);
   backdrop-filter: blur(4px);
-  color: #ffffff;
+  color: var(--c-pastel-5);
   font-size: 0.725rem;
   font-weight: 700;
   padding: 4px 10px;
@@ -361,13 +364,13 @@
 .product-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--c-dark-1);
   line-height: 1.35;
 }
 
 .product-description {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--c-dark-5);
   line-height: 1.45;
   margin-bottom: 8px;
   flex: 1;
@@ -379,7 +382,7 @@
   justify-content: space-between;
   margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--c-pastel-4);
   gap: 12px;
 }
 
@@ -392,14 +395,14 @@
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--c-pastel-1);
   letter-spacing: 0.04em;
 }
 
 .product-price {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--c-dark-1);
   letter-spacing: -0.01em;
 }
 
@@ -407,8 +410,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #0f172a;
-  color: #ffffff;
+  background-color: var(--c-dark-1);
+  color: var(--c-pastel-5);
   border: none;
   font-family: var(--font-family);
   font-size: 0.875rem;
@@ -421,9 +424,9 @@
 }
 
 .btn-add-order:hover {
-  background-color: #0284c7;
+  background-color: var(--c-dark-3);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+  box-shadow: 0 4px 12px rgba(85, 61, 42, 0.3);
 }
 
 /* ==========================================================================
@@ -878,11 +881,12 @@
   font-size: 0.9rem;
 }
 
-/* Footer Styling */
+/* Footer Styling - Dark Mocha (#5f4633) */
 .app-footer {
   margin-top: auto;
-  background-color: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  background-color: var(--c-dark-2);
+  border-top: 1px solid var(--c-dark-4);
+  color: var(--c-pastel-5);
   width: 100%;
 }
 
@@ -911,7 +915,7 @@
 
 .footer-description {
   font-size: 0.9rem;
-  color: var(--text-muted);
+  color: var(--c-pastel-4);
   line-height: 1.5;
 }
 
@@ -930,7 +934,7 @@
 .footer-heading {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--c-pastel-5);
 }
 
 .footer-list {
@@ -946,7 +950,7 @@
   border: none;
   font-family: var(--font-family);
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--c-pastel-4);
   cursor: pointer;
   padding: 0;
   text-align: left;
@@ -954,21 +958,22 @@
 }
 
 .footer-list button:hover {
-  color: #0284c7;
+  color: var(--c-pastel-5);
+  text-decoration: underline;
 }
 
 .footer-info {
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--c-pastel-4);
   line-height: 1.4;
 }
 
 .footer-bottom {
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--c-dark-4);
   padding: 20px 24px;
   text-align: center;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--c-pastel-3);
 }
 
 /* Responsive Media Queries */
