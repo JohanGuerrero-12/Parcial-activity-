@@ -1,146 +1,118 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import { getProductos } from './services/productService';
+import { getCategorias } from './services/categoryService';
 import { Header } from './components/Header';
-import { Product } from './components/Product';
+import { Footer } from './components/Footer';
+import { CatalogoPage } from './pages/CatalogoPage';
+import { ProductosPage } from './pages/ProductosPage';
+import { CategoriasPage } from './pages/CategoriasPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 function App() {
+  const [vistaActiva, setVistaActiva] = useState("catalogo"); // "catalogo" | "productos" | "categorias"
   const [categoriaActiva, setCategoriaActiva] = useState("Inicio");
   const [cartCount, setCartCount] = useState(0);
 
-  const productos = [
-    {
-      id: 1,
-      nombre: "Hamburguesa Doble",
-      categoria: "Hamburguesas",
-      descripcion: "Hamburguesa Doble Carne con queso cheddar, pepinillos y tocineta crocante",
-      precio: "20.000",
-      tag: "Más Vendido",
-      imagen: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: 2,
-      nombre: "Papas Criollas",
-      categoria: "Salchipapas",
-      descripcion: "Papas criollas crujientes sazonadas con sal marina y especias de la casa",
-      precio: "10.000",
-      tag: "Popular",
-      imagen: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: 3,
-      nombre: "Bebida Refrescante",
-      categoria: "Bebidas",
-      descripcion: "Limonada natural recién exprimida con menta y mucho hielo",
-      precio: "2.000",
-      tag: "Refrescante",
-      imagen: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80"
-    },
-    {
-      id: 4,
-      nombre: "Perro Caliente",
-      categoria: "Perros Calientes",
-      descripcion: "Perro Caliente especial con salchicha premium, papitas fósforo y salsas",
-      precio: "5.000",
-      tag: "Clásico",
-      imagen: "https://images.unsplash.com/photo-1619740455993-9e612b1af08a?w=600&auto=format&fit=crop&q=80"
-    }
-  ];
+  const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [errorApi, setErrorApi] = useState(null);
 
-  const productosFiltrados = categoriaActiva === "Inicio" 
-    ? productos 
-    : productos.filter(p => p.categoria.toLowerCase() === categoriaActiva.toLowerCase());
+  // Cargar datos desde MockAPI usando los servicios
+  const cargarDatos = useCallback(async () => {
+    setCargando(true);
+    setErrorApi(null);
+    try {
+      const [dataProductos, dataCategorias] = await Promise.all([
+        getProductos(),
+        getCategorias()
+      ]);
+      setProductos(Array.isArray(dataProductos) ? dataProductos : []);
+      setCategorias(Array.isArray(dataCategorias) ? dataCategorias : []);
+    } catch (error) {
+      console.error("Error al cargar los datos desde MockAPI:", error);
+      setErrorApi("No se pudieron cargar los datos de MockAPI. Verifica la conexión.");
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    cargarDatos();
+  }, [cargarDatos]);
 
   const handleAddToCart = () => {
     setCartCount(prev => prev + 1);
   };
 
+  const renderPaginaActiva = () => {
+    switch (vistaActiva) {
+      case "catalogo":
+        return (
+          <CatalogoPage
+            categoriaActiva={categoriaActiva}
+            productos={productos}
+            cargando={cargando}
+            onAddToCart={handleAddToCart}
+          />
+        );
+      case "productos":
+        return (
+          <ProductosPage
+            productos={productos}
+            categorias={categorias}
+            onReloadData={cargarDatos}
+          />
+        );
+      case "categorias":
+        return (
+          <CategoriasPage
+            categorias={categorias}
+            onReloadData={cargarDatos}
+          />
+        );
+      default:
+        return (
+          <NotFoundPage 
+            onGoHome={() => setVistaActiva("catalogo")} 
+          />
+        );
+    }
+  };
+
   return (
     <div className="app-layout">
-      <Header 
-        categoriaActiva={categoriaActiva} 
+      {/* Header con menú de navegación y selección de vistas */}
+      <Header
+        vistaActiva={vistaActiva}
+        onSelectVista={setVistaActiva}
+        categorias={categorias}
+        categoriaActiva={categoriaActiva}
         onSelectCategoria={setCategoriaActiva}
         cartCount={cartCount}
       />
-      
+
       <main className="app-container">
-        {/* Banner Section */}
-        <section className="hero-banner">
-          <div className="banner-badge">🔥 Menú Rápido & Delicioso</div>
-          <h1 className="banner-title">Pide tus Platillos Favoritos al Instante</h1>
-          <p className="banner-subtitle">
-            Explora nuestro menú seleccionado, ingredientes frescos y entrega rápida a tu mesa o domicilio.
-          </p>
-        </section>
-
-        {/* Section Header */}
-        <section className="catalog-header">
-          <div>
-            <h2 className="catalog-title">
-              {categoriaActiva === "Inicio" ? "Todos los Productos" : categoriaActiva}
-            </h2>
-            <p className="catalog-count">{productosFiltrados.length} producto(s) disponibles</p>
+        {errorApi && (
+          <div className="alert-banner error text-center">
+            ⚠️ {errorApi}
+            <button className="btn-retry" onClick={cargarDatos}>Reintentar</button>
           </div>
-        </section>
+        )}
 
-        {/* Product Grid */}
-        <section className="product-grid">
-          {productosFiltrados.map((producto) => (
-            <Product
-              key={producto.id}
-              indice={producto.id}
-              nombre={producto.nombre}
-              descripcion={producto.descripcion}
-              precio={producto.precio}
-              imagen={producto.imagen}
-              tag={producto.tag}
-              onAddToCart={handleAddToCart}
-            />
-          ))}
-        </section>
+        {/* Vista Renderizada */}
+        {renderPaginaActiva()}
       </main>
 
-      {/* Footer integrado directamente en App.jsx */}
-      <footer className="app-footer">
-        <div className="footer-inner">
-          <div className="footer-brand-section">
-            <div className="footer-brand">
-              <span className="brand-logo">⚡</span>
-              <span className="brand-name">Quick<span className="brand-highlight">Order</span></span>
-            </div>
-            <p className="footer-description">
-              Tu comida favorita lista para ordenar de forma rápida, fresca y sin complicaciones.
-            </p>
-          </div>
-
-          <div className="footer-links-group">
-            <div className="footer-column">
-              <h4 className="footer-heading">Categorías</h4>
-              <ul className="footer-list">
-                <li><button onClick={() => setCategoriaActiva("Hamburguesas")}>Hamburguesas</button></li>
-                <li><button onClick={() => setCategoriaActiva("Salchipapas")}>Salchipapas</button></li>
-                <li><button onClick={() => setCategoriaActiva("Perros Calientes")}>Perros Calientes</button></li>
-                <li><button onClick={() => setCategoriaActiva("Bebidas")}>Bebidas</button></li>
-              </ul>
-            </div>
-
-            <div className="footer-column">
-              <h4 className="footer-heading">Contacto & Horarios</h4>
-              <p className="footer-info">📍 Av. Principal #123, Ciudad</p>
-              <p className="footer-info">🕒 Lunes a Domingo: 11:00 AM - 10:00 PM</p>
-              <p className="footer-info">📞 +57 300 000 0000</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} QuickOrder. Todos los derechos reservados.</p>
-        </div>
-      </footer>
+      {/* Footer con links y categorías */}
+      <Footer 
+        categorias={categorias}
+        onSelectCategoria={setCategoriaActiva} 
+        onSelectVista={setVistaActiva}
+      />
     </div>
   );
 }
 
 export default App;
-
-
-
