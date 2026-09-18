@@ -6,11 +6,11 @@ export function Footer({ categorias, onSelectCategoria, onSelectVista }) {
       <div className="footer-inner">
         <div className="footer-brand-section">
           <div className="footer-brand">
-            <span className="brand-logo">⚡</span>
-            <span className="brand-name">Quick<span className="brand-highlight">Order</span></span>
+            <span className="brand-logo">†</span>
+            <span className="brand-name">Dulce<span className="brand-highlight">Bendicion</span></span>
           </div>
           <p className="footer-description">
-            Tu comida favorita lista para ordenar de forma rápida, fresca y sin complicaciones.
+            Tu comida favorita lista para ordenar de forma rápida, fresca , sin complicaciones y con bendicion.
           </p>
         </div>
 
@@ -32,7 +32,7 @@ export function Footer({ categorias, onSelectCategoria, onSelectVista }) {
       </div>
 
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} QuickOrder. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} DulceBendicion. Todos las Bendiciones en camino.</p>
       </div>
     </footer>
   );

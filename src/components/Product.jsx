@@ -61,7 +61,13 @@ export function Product({ indice, nombre, categoria, descripcion, precio, imagen
           </div>
           <button
             className="btn-add-order"
-            onClick={() => !esLimon && onAddToCart && onAddToCart(nombre)}
+            onClick={() => !esLimon && onAddToCart && onAddToCart({
+              id: indice,
+              nombre,
+              precio: precioNumerico,
+              imagen,
+              categoria
+            })}
             disabled={esLimon}
             style={esLimon ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
           >

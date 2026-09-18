@@ -54,7 +54,7 @@ export function CatalogoPage({
               descripcion={producto.descripcion}
               precio={producto.precio}
               imagen={producto.imagen}
-              tag={producto.tag}
+              tag={producto.tag || producto.Etiqueta}
               onAddToCart={onAddToCart}
             />
           ))

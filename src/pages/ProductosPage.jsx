@@ -29,7 +29,7 @@ export function ProductosPage({ productos, categorias, onReloadData }) {
       nombre: producto.nombre || '',
       precio: producto.precio !== undefined ? String(producto.precio) : '',
       categoria: producto.categoria || (categorias[0]?.nombre || 'Hamburguesas'),
-      tag: producto.tag || '',
+      tag: producto.tag || producto.Etiqueta || '',
       imagen: producto.imagen || '',
       descripcion: producto.descripcion || ''
     });
@@ -70,6 +70,7 @@ export function ProductosPage({ productos, categorias, onReloadData }) {
       precio: precioLimpio,
       categoria: formData.categoria || 'Hamburguesas',
       tag: formData.tag.trim(),
+      Etiqueta: formData.tag.trim(),
       imagen: formData.imagen.trim(),
       descripcion: formData.descripcion.trim()
     };
@@ -292,7 +293,7 @@ export function ProductosPage({ productos, categorias, onReloadData }) {
                       ${typeof prod.precio === 'number' ? prod.precio.toLocaleString('es-CO') : prod.precio}
                     </td>
                     <td>
-                      {prod.tag ? <span className="badge-tag">{prod.tag}</span> : '-'}
+                      {(prod.tag || prod.Etiqueta) ? <span className="badge-tag">{prod.tag || prod.Etiqueta}</span> : '-'}
                     </td>
                     <td className="cell-actions">
                       <button

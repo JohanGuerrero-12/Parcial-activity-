@@ -8,11 +8,17 @@ import { CatalogoPage } from './pages/CatalogoPage';
 import { ProductosPage } from './pages/ProductosPage';
 import { CategoriasPage } from './pages/CategoriasPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { CartModal } from './components/CartModal';
+import { SuccessModal } from './components/SuccessModal';
 
 function App() {
   const [vistaActiva, setVistaActiva] = useState("catalogo"); // "catalogo" | "productos" | "categorias"
   const [categoriaActiva, setCategoriaActiva] = useState("Inicio");
-  const [cartCount, setCartCount] = useState(0);
+
+  // Estado del Carrito / Pedido
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
@@ -42,9 +48,50 @@ function App() {
     cargarDatos();
   }, [cargarDatos]);
 
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
+  // Manejo de Carrito
+  const handleAddToCart = (producto) => {
+    setCartItems((prevItems) => {
+      const itemExistente = prevItems.find((item) => item.id === producto.id);
+      if (itemExistente) {
+        return prevItems.map((item) =>
+          item.id === producto.id
+            ? { ...item, cantidad: item.cantidad + 1 }
+            : item
+        );
+      }
+      return [...prevItems, { ...producto, cantidad: 1 }];
+    });
   };
+
+  const handleUpdateQuantity = (productoId, delta) => {
+    setCartItems((prevItems) =>
+      prevItems
+        .map((item) => {
+          if (item.id === productoId) {
+            const nuevaCantidad = item.cantidad + delta;
+            return nuevaCantidad > 0 ? { ...item, cantidad: nuevaCantidad } : null;
+          }
+          return item;
+        })
+        .filter(Boolean)
+    );
+  };
+
+  const handleRemoveItem = (productoId) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== productoId));
+  };
+
+  const handleClearCart = () => {
+    setCartItems([]);
+  };
+
+  const handleCheckout = () => {
+    setCartItems([]);
+    setIsCartOpen(false);
+    setShowSuccessModal(true);
+  };
+
+  const totalCartCount = cartItems.reduce((acc, item) => acc + item.cantidad, 0);
 
   const renderPaginaActiva = () => {
     switch (vistaActiva) {
@@ -90,7 +137,8 @@ function App() {
         categorias={categorias}
         categoriaActiva={categoriaActiva}
         onSelectCategoria={setCategoriaActiva}
-        cartCount={cartCount}
+        cartCount={totalCartCount}
+        onOpenCart={() => setIsCartOpen(true)}
       />
 
       <main className="app-container">
@@ -104,6 +152,23 @@ function App() {
         {/* Vista Renderizada */}
         {renderPaginaActiva()}
       </main>
+
+      {/* Modal de Mi Pedido */}
+      <CartModal
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cartItems}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+        onClearCart={handleClearCart}
+        onCheckout={handleCheckout}
+      />
+
+      {/* Modal de Exito al Comprar */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+      />
 
       {/* Footer con links y categorías */}
       <Footer 
