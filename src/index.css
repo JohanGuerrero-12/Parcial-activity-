@@ -39,9 +39,8 @@
 
 body {
   font-family: var(--font-family);
-  /* background-color: var(--bg-color); */
-  background-color: #2b1b12; /* TEMPORAL: Modo Noche Café Oscuro */
-  color: #fff9e1;
+  background-color: var(--bg-color);
+  color: var(--text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
