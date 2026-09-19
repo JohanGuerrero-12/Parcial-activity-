@@ -20,7 +20,7 @@ export function Menu({ categorias = [], categoriaActiva = "Inicio", onSelectCate
         </button>
       )}
 
-      {categorias.map((cat) => {
+      {categorias.filter((cat) => cat.nombre && cat.nombre.trim() !== "").map((cat) => {
         const label = capitalizar(cat.nombre);
         const isActive = categoriaActiva.toLowerCase() === label.toLowerCase();
         return (

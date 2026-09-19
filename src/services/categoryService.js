@@ -1,4 +1,4 @@
-const API_URL = "https://6a9b0ab70ad174e139e8801b.mockapi.io/categorias";
+const API_URL = "https://6aa6bb76d7765db985078f74.mockapi.io/categoria";
 
 export async function getCategorias() {
   const response = await fetch(API_URL);

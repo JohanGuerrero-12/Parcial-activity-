@@ -2,70 +2,76 @@ import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { getProductos } from './services/productService';
 import { getCategorias } from './services/categoryService';
+import { crearOrden } from './services/orderService';
+import { getUsuarioActivo, setUsuarioActivo, buscarOCrearUsuario } from './services/usuarioService';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { CatalogoPage } from './pages/CatalogoPage';
 import { ProductosPage } from './pages/ProductosPage';
 import { CategoriasPage } from './pages/CategoriasPage';
+import { OrdenesPage } from './pages/OrdenesPage';
+import { UsuariosPage } from './pages/UsuariosPage';
+import { InformationPage } from './pages/InformationPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { CartModal } from './components/CartModal';
 import { SuccessModal } from './components/SuccessModal';
 
 function App() {
-  const [vistaActiva, setVistaActiva] = useState("catalogo"); // "catalogo" | "productos" | "categorias"
+  const [vistaActiva, setVistaActiva] = useState("catalogo");
   const [categoriaActiva, setCategoriaActiva] = useState("Inicio");
 
-  // Estado del Carrito / Pedido
+  // Carrito
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [ordenId, setOrdenId] = useState(null);
 
+  // Datos
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [errorApi, setErrorApi] = useState(null);
 
-  // Cargar datos desde MockAPI usando los servicios
+  // Usuario activo (desde localStorage)
+  const [usuarioActivo, setUsuarioActivoState] = useState(() => getUsuarioActivo());
+
+  // Cargar productos y categorías
   const cargarDatos = useCallback(async () => {
     setCargando(true);
     setErrorApi(null);
     try {
       const [dataProductos, dataCategorias] = await Promise.all([
         getProductos(),
-        getCategorias()
+        getCategorias(),
       ]);
       setProductos(Array.isArray(dataProductos) ? dataProductos : []);
       setCategorias(Array.isArray(dataCategorias) ? dataCategorias : []);
     } catch (error) {
-      console.error("Error al cargar los datos desde MockAPI:", error);
+      console.error("Error al cargar datos desde MockAPI:", error);
       setErrorApi("No se pudieron cargar los datos de MockAPI. Verifica la conexión.");
     } finally {
       setCargando(false);
     }
   }, []);
 
-  useEffect(() => {
-    cargarDatos();
-  }, [cargarDatos]);
+  useEffect(() => { cargarDatos(); }, [cargarDatos]);
 
-  // Manejo de Carrito
+  // ── Carrito ────────────────────────────────────────────────────────────────
   const handleAddToCart = (producto) => {
-    setCartItems((prevItems) => {
-      const itemExistente = prevItems.find((item) => item.id === producto.id);
-      if (itemExistente) {
-        return prevItems.map((item) =>
-          item.id === producto.id
-            ? { ...item, cantidad: item.cantidad + 1 }
-            : item
+    setCartItems((prev) => {
+      const existente = prev.find((item) => item.id === producto.id);
+      if (existente) {
+        return prev.map((item) =>
+          item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
         );
       }
-      return [...prevItems, { ...producto, cantidad: 1 }];
+      return [...prev, { ...producto, cantidad: 1 }];
     });
   };
 
   const handleUpdateQuantity = (productoId, delta) => {
-    setCartItems((prevItems) =>
-      prevItems
+    setCartItems((prev) =>
+      prev
         .map((item) => {
           if (item.id === productoId) {
             const nuevaCantidad = item.cantidad + delta;
@@ -78,21 +84,73 @@ function App() {
   };
 
   const handleRemoveItem = (productoId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== productoId));
+    setCartItems((prev) => prev.filter((item) => item.id !== productoId));
   };
 
-  const handleClearCart = () => {
-    setCartItems([]);
-  };
+  const handleClearCart = () => setCartItems([]);
 
-  const handleCheckout = () => {
-    setCartItems([]);
-    setIsCartOpen(false);
-    setShowSuccessModal(true);
+  // ── Checkout — guarda la orden en MockAPI ──────────────────────────────────
+  const handleCheckout = async ({ nombre, mesa }) => {
+    const total = cartItems.reduce((acc, item) => {
+      const precio = typeof item.precio === 'number'
+        ? item.precio
+        : parseFloat(String(item.precio || 0).replace(/\./g, '').replace(/,/g, '.')) || 0;
+      return acc + precio * item.cantidad;
+    }, 0);
+
+    try {
+      let clienteGuardado = { id: null, nombre, mesa, email: '' };
+      try {
+        const cliente = await buscarOCrearUsuario({ nombre, mesa });
+        clienteGuardado = {
+          id: cliente?.id || null,
+          nombre: cliente?.nombre || nombre,
+          mesa: cliente?.mesa || mesa,
+          email: cliente?.email || '',
+        };
+      } catch (userErr) {
+        console.error("No se pudo guardar el cliente en Usuarios:", userErr);
+      }
+
+      const ordenData = {
+        usuarioId: clienteGuardado.id,
+        usuario: clienteGuardado.nombre,
+        cliente: clienteGuardado.nombre,
+        mesa: clienteGuardado.mesa,
+        email: clienteGuardado.email,
+        items: cartItems.map((item) => ({
+          id: item.id,
+          nombre: item.nombre,
+          precio: item.precio,
+          cantidad: item.cantidad,
+        })),
+        total,
+        estado: 'pendiente',
+        fecha: new Date().toISOString(),
+      };
+
+      const ordenCreada = await crearOrden(ordenData);
+      setOrdenId(ordenCreada?.id || null);
+      const activo = {
+        id: clienteGuardado.id,
+        nombre: clienteGuardado.nombre,
+        mesa: clienteGuardado.mesa,
+      };
+      setUsuarioActivo(activo);
+      setUsuarioActivoState(activo);
+    } catch (err) {
+      console.error("Error al guardar la orden:", err);
+      setOrdenId(null);
+    } finally {
+      setCartItems([]);
+      setIsCartOpen(false);
+      setShowSuccessModal(true);
+    }
   };
 
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.cantidad, 0);
 
+  // ── Renderizado de vista activa ────────────────────────────────────────────
   const renderPaginaActiva = () => {
     switch (vistaActiva) {
       case "catalogo":
@@ -119,18 +177,19 @@ function App() {
             onReloadData={cargarDatos}
           />
         );
+      case "ordenes":
+        return <OrdenesPage />;
+      case "usuarios":
+        return <UsuariosPage />;
+      case "informacion":
+        return <InformationPage />;
       default:
-        return (
-          <NotFoundPage 
-            onGoHome={() => setVistaActiva("catalogo")} 
-          />
-        );
+        return <NotFoundPage onGoHome={() => setVistaActiva("catalogo")} />;
     }
   };
 
   return (
     <div className="app-layout">
-      {/* Header con menú de navegación y selección de vistas */}
       <Header
         vistaActiva={vistaActiva}
         onSelectVista={setVistaActiva}
@@ -139,6 +198,7 @@ function App() {
         onSelectCategoria={setCategoriaActiva}
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
+        usuarioActivo={usuarioActivo}
       />
 
       <main className="app-container">
@@ -148,12 +208,9 @@ function App() {
             <button className="btn-retry" onClick={cargarDatos}>Reintentar</button>
           </div>
         )}
-
-        {/* Vista Renderizada */}
         {renderPaginaActiva()}
       </main>
 
-      {/* Modal de Mi Pedido */}
       <CartModal
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -164,16 +221,15 @@ function App() {
         onCheckout={handleCheckout}
       />
 
-      {/* Modal de Exito al Comprar */}
       <SuccessModal
         isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
+        onClose={() => { setShowSuccessModal(false); setOrdenId(null); }}
+        ordenId={ordenId}
       />
 
-      {/* Footer con links y categorías */}
-      <Footer 
+      <Footer
         categorias={categorias}
-        onSelectCategoria={setCategoriaActiva} 
+        onSelectCategoria={setCategoriaActiva}
         onSelectVista={setVistaActiva}
       />
     </div>
