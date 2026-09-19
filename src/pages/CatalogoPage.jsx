@@ -15,7 +15,7 @@ export function CatalogoPage({
       {/* Banner Hero */}
       <section className="hero-banner">
         <div className="banner-badge">🔥Menú Rápido & Delicioso</div>
-        <h1 className="banner-title">Pide tus Platillos Favoritos al Instante</h1>
+        <h1 className="banner-title">Pide tus panes y se te daran al instante</h1>
         <p className="banner-subtitle">
           Explora nuestro menú seleccionado, ingredientes frescos y entrega rápida a tu mesa o domicilio.
         </p>

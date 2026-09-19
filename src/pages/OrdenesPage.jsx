@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getOrdenes, actualizarOrden, eliminarOrden } from '../services/orderService';
+import { getOrdenesDetalladas, actualizarOrden, eliminarOrden } from '../services/orderService';
 import { ESTADOS_ORDEN } from '../services/estadoOrdenService';
 import { EstadoBadge } from '../components/EstadoBadge';
 
@@ -14,8 +14,7 @@ export function OrdenesPage() {
     setCargando(true);
     setError(null);
     try {
-      const data = await getOrdenes();
-      // Ordenar por fecha descendente (más recientes primero)
+      const data = await getOrdenesDetalladas();
       const ordenadas = Array.isArray(data)
         ? [...data].sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
         : [];
@@ -90,10 +89,6 @@ export function OrdenesPage() {
           <span className="stat-number">{ordenes.length}</span>
           <span className="stat-label">Total Órdenes</span>
         </div>
-        <div className="orden-stat-card pending">
-          <span className="stat-number">{contarPorEstado('pendiente')}</span>
-          <span className="stat-label">Pendientes</span>
-        </div>
         <div className="orden-stat-card preparing">
           <span className="stat-number">{contarPorEstado('en_preparacion')}</span>
           <span className="stat-label">En Preparación</span>
@@ -121,7 +116,7 @@ export function OrdenesPage() {
         >
           Todos ({ordenes.length})
         </button>
-        {ESTADOS_ORDEN.map((e) => (
+        {ESTADOS_ORDEN.filter((e) => e.value !== 'pendiente').map((e) => (
           <button
             key={e.value}
             className={`filter-pill ${filtroEstado === e.value ? 'active' : ''}`}

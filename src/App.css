@@ -645,6 +645,31 @@
   border: 1px solid #fecaca;
 }
 
+.login-shell {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+}
+
+.login-card {
+  width: min(100%, 430px);
+  margin: 0 auto;
+}
+
+.login-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--c-pastel-3);
+  background: var(--c-pastel-4);
+  color: var(--c-dark-2);
+  font-size: 0.8rem;
+}
+
 .btn-retry {
   background-color: #991b1b;
   color: #ffffff;

@@ -1,6 +1,6 @@
 import { MenuInferior } from './MenuInferior';
 
-export function Footer({ categorias, onSelectCategoria, onSelectVista }) {
+export function Footer({ categorias, onSelectCategoria, onSelectVista, rol }) {
   return (
     <footer className="app-footer">
       <div className="footer-inner">
@@ -15,7 +15,6 @@ export function Footer({ categorias, onSelectCategoria, onSelectVista }) {
         </div>
 
         <div className="footer-links-group">
-          {/* Componente del Menú de Opciones del Pie de Página */}
           <MenuInferior 
             categorias={categorias} 
             onSelectCategoria={onSelectCategoria} 

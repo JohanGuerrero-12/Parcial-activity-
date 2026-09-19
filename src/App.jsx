@@ -13,11 +13,41 @@ import { OrdenesPage } from './pages/OrdenesPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { InformationPage } from './pages/InformationPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { LoginPage } from './pages/LoginPage';
 import { CartModal } from './components/CartModal';
 import { SuccessModal } from './components/SuccessModal';
 
+const AUTH_KEY = 'quickorder_session';
+
+const PERMISOS = {
+  admin: ['catalogo', 'productos', 'categorias', 'ordenes', 'usuarios', 'informacion'],
+  trabajador: ['catalogo', 'ordenes', 'usuarios', 'informacion'],
+};
+
+function getSesionGuardada() {
+  try {
+    const data = localStorage.getItem(AUTH_KEY);
+    return data ? JSON.parse(data) : null;
+  } catch {
+    return null;
+  }
+}
+
+function guardarSesion(usuario) {
+  try {
+    localStorage.setItem(AUTH_KEY, JSON.stringify(usuario));
+  } catch (error) {
+    console.error('No se pudo guardar la sesión:', error);
+  }
+}
+
+function limpiarSesion() {
+  localStorage.removeItem(AUTH_KEY);
+}
+
 function App() {
-  const [vistaActiva, setVistaActiva] = useState("catalogo");
+  const [usuarioSesion, setUsuarioSesion] = useState(() => getSesionGuardada());
+  const [vistaActiva, setVistaActiva] = useState('catalogo');
   const [categoriaActiva, setCategoriaActiva] = useState("Inicio");
 
   // Carrito
@@ -34,6 +64,29 @@ function App() {
 
   // Usuario activo (desde localStorage)
   const [usuarioActivo, setUsuarioActivoState] = useState(() => getUsuarioActivo());
+
+  useEffect(() => {
+    if (!usuarioSesion) return;
+    const vistasPermitidas = PERMISOS[usuarioSesion.rol] || [];
+    if (!vistasPermitidas.includes(vistaActiva)) {
+      setVistaActiva('catalogo');
+    }
+  }, [usuarioSesion, vistaActiva]);
+
+  const handleLogin = ({ nombre, usuario, rol }) => {
+    const sesion = { nombre, usuario, rol };
+    setUsuarioSesion(sesion);
+    guardarSesion(sesion);
+    setVistaActiva('catalogo');
+    setCategoriaActiva('Inicio');
+  };
+
+  const handleLogout = () => {
+    setUsuarioSesion(null);
+    limpiarSesion();
+    setVistaActiva('catalogo');
+    setCategoriaActiva('Inicio');
+  };
 
   // Cargar productos y categorías
   const cargarDatos = useCallback(async () => {
@@ -152,6 +205,16 @@ function App() {
 
   // ── Renderizado de vista activa ────────────────────────────────────────────
   const renderPaginaActiva = () => {
+    const vistasPermitidas = PERMISOS[usuarioSesion?.rol] || [];
+
+    if (!usuarioSesion) {
+      return <LoginPage onLogin={handleLogin} />;
+    }
+
+    if (!vistasPermitidas.includes(vistaActiva)) {
+      return <OrdenesPage />;
+    }
+
     switch (vistaActiva) {
       case "catalogo":
         return (
@@ -188,6 +251,10 @@ function App() {
     }
   };
 
+  if (!usuarioSesion) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
   return (
     <div className="app-layout">
       <Header
@@ -199,6 +266,8 @@ function App() {
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
         usuarioActivo={usuarioActivo}
+        usuarioSesion={usuarioSesion}
+        onLogout={handleLogout}
       />
 
       <main className="app-container">
@@ -231,6 +300,7 @@ function App() {
         categorias={categorias}
         onSelectCategoria={setCategoriaActiva}
         onSelectVista={setVistaActiva}
+        rol={usuarioSesion?.rol}
       />
     </div>
   );

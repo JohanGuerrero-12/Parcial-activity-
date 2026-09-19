@@ -8,26 +8,24 @@ export function Header({
   onSelectCategoria,
   cartCount = 0,
   onOpenCart,
-  usuarioActivo,
+  usuarioSesion,
+  onLogout,
 }) {
-  const esAdmin = vistaActiva !== 'catalogo';
+  const esAdmin = usuarioSesion?.rol === 'admin';
 
   return (
     <header className="header-navbar">
       <div className="header-inner">
-        {/* Brand / Logo */}
         <div className="header-brand-group">
           <div className="header-brand" onClick={() => onSelectVista('catalogo')}>
             <div className="brand-logo">†</div>
             <span className="brand-name">Dulce<span className="brand-highlight">Bendición</span></span>
           </div>
 
-          {esAdmin && (
-            <span className="admin-badge">Modo Administración</span>
-          )}
+          {esAdmin && <span className="admin-badge">Modo Administración</span>}
+          {!esAdmin && <span className="admin-badge">Modo Trabajador</span>}
         </div>
 
-        {/* Category nav (solo en catálogo) */}
         {vistaActiva === 'catalogo' && (
           <Menu
             categorias={categorias}
@@ -36,10 +34,8 @@ export function Header({
           />
         )}
 
-        {/* Actions */}
         <div className="header-actions">
           <nav className="view-switcher">
-            {/* Catálogo */}
             <button
               className={`nav-tab ${vistaActiva === 'catalogo' ? 'active' : ''}`}
               onClick={() => onSelectVista('catalogo')}
@@ -47,20 +43,24 @@ export function Header({
               <span className="tab-icon">🛍️</span> Catálogo
             </button>
 
-            {/* Grupo Admin */}
             <div className="nav-tab-group">
-              <button
-                className={`nav-tab ${vistaActiva === 'productos' ? 'active' : ''}`}
-                onClick={() => onSelectVista('productos')}
-              >
-                <span className="tab-icon">🛠️</span> Productos
-              </button>
-              <button
-                className={`nav-tab ${vistaActiva === 'categorias' ? 'active' : ''}`}
-                onClick={() => onSelectVista('categorias')}
-              >
-                <span className="tab-icon">🏷️</span> Categorías
-              </button>
+              {esAdmin && (
+                <>
+                  <button
+                    className={`nav-tab ${vistaActiva === 'productos' ? 'active' : ''}`}
+                    onClick={() => onSelectVista('productos')}
+                  >
+                    <span className="tab-icon">🛠️</span> Productos
+                  </button>
+                  <button
+                    className={`nav-tab ${vistaActiva === 'categorias' ? 'active' : ''}`}
+                    onClick={() => onSelectVista('categorias')}
+                  >
+                    <span className="tab-icon">🏷️</span> Categorías
+                  </button>
+                </>
+              )}
+
               <button
                 className={`nav-tab ${vistaActiva === 'ordenes' ? 'active' : ''}`}
                 onClick={() => onSelectVista('ordenes')}
@@ -71,7 +71,7 @@ export function Header({
                 className={`nav-tab ${vistaActiva === 'usuarios' ? 'active' : ''}`}
                 onClick={() => onSelectVista('usuarios')}
               >
-                <span className="tab-icon">👤</span> Usuarios
+                <span className="tab-icon">👤</span> Clientes
               </button>
               <button
                 className={`nav-tab ${vistaActiva === 'informacion' ? 'active' : ''}`}
@@ -82,16 +82,16 @@ export function Header({
             </div>
           </nav>
 
-          {/* Usuario activo + Carrito */}
           <div className="header-right-group">
-            {usuarioActivo && (
-              <div className="usuario-chip">
-                <span className="usuario-chip-icon">👤</span>
-                <span className="usuario-chip-name">{usuarioActivo.nombre}</span>
-                {usuarioActivo.mesa && (
-                  <span className="usuario-chip-mesa">Mesa {usuarioActivo.mesa}</span>
-                )}
-              </div>
+            {usuarioSesion && (
+              <>
+                <div className="usuario-chip">
+                  <span className="usuario-chip-icon">{esAdmin ? '🔑' : '🧑‍💼'}</span>
+                  <span className="usuario-chip-name">{usuarioSesion.nombre}</span>
+                  <span className="usuario-chip-mesa">{esAdmin ? 'Admin' : 'Trabajador'}</span>
+                </div>
+                <button className="btn-secondary btn-sm" onClick={onLogout}>Cerrar sesión</button>
+              </>
             )}
 
             {vistaActiva === 'catalogo' && (

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { getOrdenes } from '../services/orderService';
+import { getOrdenesDetalladas, esOrdenCompletada } from '../services/orderService';
 import { EstadoBadge } from '../components/EstadoBadge';
 
 export function InformationPage() {
@@ -13,7 +13,7 @@ export function InformationPage() {
     setCargando(true);
     setError(null);
     try {
-      const data = await getOrdenes();
+      const data = await getOrdenesDetalladas();
       const ordenadas = Array.isArray(data)
         ? [...data].sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
         : [];
@@ -68,7 +68,9 @@ export function InformationPage() {
     });
   }, [ordenes, busqueda]);
 
-  const totalVentas = historialFiltrado.reduce((acc, o) => {
+  const ventasCompletadas = historialFiltrado.filter(esOrdenCompletada);
+
+  const totalVentas = ventasCompletadas.reduce((acc, o) => {
     const num = typeof o.total === 'number' ? o.total : parseFloat(o.total) || 0;
     return acc + num;
   }, 0);
