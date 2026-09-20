@@ -1,5 +1,27 @@
-const API_URL = "https://6aa6bb76d7765db985078f74.mockapi.io/cliente";
+const API_URLS = [
+  "https://6aa6bb76d7765db985078f74.mockapi.io/usuario",
+  "https://6aa6bb76d7765db985078f74.mockapi.io/cliente",
+];
 const USER_KEY = "quickorder_usuario_activo";
+
+async function fetchWithFallback(urls, options = {}) {
+  let ultimoError = null;
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        ultimoError = new Error(`HTTP ${response.status} en ${url}`);
+        continue;
+      }
+      return response;
+    } catch (error) {
+      ultimoError = error;
+    }
+  }
+
+  throw ultimoError || new Error('No se pudo conectar con el endpoint de usuarios');
+}
 
 // ── LocalStorage helpers ──────────────────────────────────────────────────────
 export function getUsuarioActivo() {
@@ -25,18 +47,16 @@ export function clearUsuarioActivo() {
 
 // ── MockAPI CRUD ──────────────────────────────────────────────────────────────
 export async function getUsuarios() {
-  const response = await fetch(API_URL);
-  if (!response.ok) throw new Error("Error al obtener los usuarios");
+  const response = await fetchWithFallback(API_URLS);
   return response.json();
 }
 
 export async function crearUsuario(data) {
-  const response = await fetch(API_URL, {
+  const response = await fetchWithFallback(API_URLS, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Error al crear el usuario");
   return response.json();
 }
 
@@ -73,19 +93,17 @@ export async function buscarOCrearUsuario({ nombre, mesa = "", email = "" }) {
 }
 
 export async function actualizarUsuario(id, data) {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await fetchWithFallback(API_URLS.map((url) => `${url}/${id}`), {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Error al actualizar el usuario");
   return response.json();
 }
 
 export async function eliminarUsuario(id) {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await fetchWithFallback(API_URLS.map((url) => `${url}/${id}`), {
     method: "DELETE",
   });
-  if (!response.ok) throw new Error("Error al eliminar el usuario");
   return response.json();
 }

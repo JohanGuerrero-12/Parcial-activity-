@@ -1502,6 +1502,36 @@
 /* ═══════════════════════════════════════════════════════════
    ÓRDENES PAGE — Stats row
 ═══════════════════════════════════════════════════════════ */
+.info-summary-card {
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.12), rgba(59, 130, 246, 0.1));
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.info-summary-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--c-pastel-4);
+  margin-bottom: 0.35rem;
+}
+
+.info-summary-card h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.2rem;
+  color: var(--c-pastel-5);
+}
+
+.info-summary-card p {
+  margin: 0;
+  color: var(--c-pastel-3);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
 .ordenes-stats-row {
   display: flex;
   gap: 1rem;
@@ -1762,7 +1792,18 @@
   color: var(--c-pastel-3);
   padding: 4px 0;
 }
+@media (max-width: 768px) {
+  .ordenes-stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 640px) {
+  .ordenes-stats-row {
+    grid-template-columns: 1fr;
+  }
+
   .historial-card-header {
     grid-template-columns: 1fr;
     gap: 0.5rem;

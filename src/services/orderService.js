@@ -1,6 +1,5 @@
 import { getUsuarios } from './usuarioService';
-import { getEstadosOrden } from './estadoOrdenService';
-
+import { getEstadosOrden, getEstadoMeta } from './estadoOrdenService';
 const API_URL = "https://6aa6bb76d7765db985078f74.mockapi.io/orden";
 
 export function normalizarEstadoOrden(estado) {
@@ -18,9 +17,7 @@ export function normalizarOrden(orden, usuarios = [], estados = []) {
     : null;
 
   const estado = normalizarEstadoOrden(orden?.estado);
-  const estadoInfo = Array.isArray(estados)
-    ? estados.find((e) => normalizarEstadoOrden(e?.value || e?.nombre || e?.id) === estado)
-    : null;
+  const estadoInfo = getEstadoMeta(estado, estados);
 
   return {
     ...orden,
@@ -30,7 +27,8 @@ export function normalizarOrden(orden, usuarios = [], estados = []) {
     mesa: orden?.mesa || usuario?.mesa || '',
     email: orden?.email || usuario?.email || '',
     estado,
-    nombreEstado: estadoInfo?.label || estado || 'Sin estado',
+    nombreEstado: estadoInfo.label || 'Sin estado',
+    colorEstado: estadoInfo.color || '#6b7280',
   };
 }
 

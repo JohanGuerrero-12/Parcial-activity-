@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getOrdenesDetalladas, esOrdenCompletada } from '../services/orderService';
+import { getInformation } from '../services/informationService';
 import { EstadoBadge } from '../components/EstadoBadge';
 
 export function InformationPage() {
   const [ordenes, setOrdenes] = useState([]);
+  const [informacion, setInformacion] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [busqueda, setBusqueda] = useState('');
@@ -13,11 +15,17 @@ export function InformationPage() {
     setCargando(true);
     setError(null);
     try {
-      const data = await getOrdenesDetalladas();
+      const [data, info] = await Promise.all([
+        getOrdenesDetalladas().catch(() => []),
+        getInformation().catch(() => null),
+      ]);
+
       const ordenadas = Array.isArray(data)
         ? [...data].sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
         : [];
+
       setOrdenes(ordenadas);
+      setInformacion(info);
     } catch (err) {
       setError('No se pudo cargar el historial de compras. Verifica el endpoint /orden en MockAPI.');
     } finally {
@@ -101,6 +109,16 @@ export function InformationPage() {
           Registro de lo que se vendió: cliente, hora y productos de cada pedido.
         </p>
       </header>
+
+      {informacion && (
+        <div className="info-summary-card">
+          <span className="info-summary-label">Información del negocio</span>
+          <h2>{informacion.titulo || informacion.nombre || 'Resumen del negocio'}</h2>
+          <p>
+            {informacion.descripcion || informacion.resumen || informacion.mensaje || 'Sin información adicional disponible.'}
+          </p>
+        </div>
+      )}
 
       <div className="ordenes-stats-row">
         <div className="orden-stat-card">
